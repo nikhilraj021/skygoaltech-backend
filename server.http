@@ -9,3 +9,8 @@ content-type : application/json
     "username" : "bunny",
     "password" : "rdnlsnfl5"
 }
+
+###
+
+GET http://localhost:3000/employee_details/
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImdvcGFsIiwiaWF0IjoxNzE2Nzg5OTExfQ.X0gk2P3nhNQJzU-ONcVwvJ_aHA-gqPXb0L7RDOs8854

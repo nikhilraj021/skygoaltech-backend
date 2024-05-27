@@ -2,6 +2,7 @@ const express = require('express')
 const {open} = require("sqlite")
 const sqlite3 = require("sqlite3")
 const bcrypt = require('bcrypt')
+const jwt = require('jsonwebtoken')
 
 const path = require("path")
 const dbpath = path.join(__dirname, "information.db")
@@ -17,7 +18,7 @@ const initilizeDBAndServer = async () =>{
             driver : sqlite3.Database
         })
         await db.run(
-            `CREATE TABLE IF NOT EXISTS users(id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT, password TEXT)`
+            `CREATE TABLE IF NOT EXISTS employees (id INTEGER PRIMARY KEY AUTOINCREMENT, Employee_Name TEXT, Employee_Designation TEXT, Salary INT)`
         )
         app.listen(3000, () => {
             console.log("Server running at http://localhost:3000/")
@@ -65,10 +66,44 @@ app.post("/login/", async (request, response) =>{
         // compare password, hashed password
         const isPasswordMatched = await bcrypt.compare(password, dbUser.password);
         if(isPasswordMatched === true){
-            response.send("Login Success")
+            const payload = {username : username}
+            const jwtToken = jwt.sign(payload, "asdfghjkl");
+            response.send({jwtToken})
         }else{
             response.status(400);
             response.send("Invalid Password");
         }
+    }
+})
+
+// Inserting employee_details
+app.post('/employee/', async (request, response) =>{
+    const {Employee_Name, Employee_Designation, Salary} = request.body 
+    const addEmployeeQuery = `INSERT INTO employees(Employee_Name, Employee_Designation, Salary) VALUES ("${Employee_Name}", "${Employee_Designation}", ${Salary});`;
+    await db.run(addEmployeeQuery);
+    response.send("Added Emmployee")
+})
+
+// GET employees_details api 
+app.get("/employee_details/", async(req, resp) =>{
+    let jwtToken;
+    const authHeader = req.headers["authorization"];
+    if(authHeader !== undefined){
+        jwtToken = authHeader.split(" ")[1];
+    }
+    if(jwtToken === undefined){
+        resp.status(401)
+        resp.send("Invalid Access Token")
+    }else{
+        jwt.verify(jwtToken, "asdfghjkl", async (error, user) =>{
+            if(error){
+                resp.status(401)
+                resp.send("Invalid Access Token");
+            }else{
+                const getUserDetails = `SELECT * FROM employees;`;
+                const employeeDetailsArray = await db.all(getUserDetails)
+                resp.send(employeeDetailsArray);
+            }
+        })
     }
 })
