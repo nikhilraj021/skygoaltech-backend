@@ -84,26 +84,33 @@ app.post('/employee/', async (request, response) =>{
     response.send("Added Emmployee")
 })
 
-// GET employees_details api 
-app.get("/employee_details/", async(req, resp) =>{
+const authenticateToken = (request, response, next) =>{
+    const authHeader = request.headers["authorization"];
     let jwtToken;
-    const authHeader = req.headers["authorization"];
     if(authHeader !== undefined){
-        jwtToken = authHeader.split(" ")[1];
+        jwtToken = authHeader.split(" ")[1]
     }
     if(jwtToken === undefined){
-        resp.status(401)
-        resp.send("Invalid Access Token")
-    }else{
-        jwt.verify(jwtToken, "asdfghjkl", async (error, user) =>{
+        response.status(401)
+        response.send("Invalid JWT Token")
+    }
+    else{
+        jwt.verify(jwtToken, "asdfghjkl", async(error, user) =>{
             if(error){
-                resp.status(401)
-                resp.send("Invalid Access Token");
+                response.status(401)
+                response.send("Invalid JWT Token")
             }else{
-                const getUserDetails = `SELECT * FROM employees;`;
-                const employeeDetailsArray = await db.all(getUserDetails)
-                resp.send(employeeDetailsArray);
+                next()
             }
         })
     }
+}
+
+// GET employees_details api 
+app.get("/employee_details/", authenticateToken, async (req, resp) =>{
+    const getUserDetails = `SELECT * FROM employees;`;
+    const employeeDetailsArray = await db.all(getUserDetails)
+    resp.send(employeeDetailsArray);
 })
+
+
