@@ -10,7 +10,20 @@ content-type : application/json
     "password" : "rdnlsnfl5"
 }
 
+### 
+POST http://localhost:3000/login/
+content-type : application/json
+
+{
+  "username" : "bunny",
+  "password" : "rdnlsnfl5"
+}
+
 ###
 
 GET http://localhost:3000/employee_details/
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImdvcGFsIiwiaWF0IjoxNzE2Nzg5OTExfQ.X0gk2P3nhNQJzU-ONcVwvJ_aHA-gqPXb0L7RDOs8854
+
+### 
+GET http://localhost:3000/profile/
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImJ1bm55IiwiaWF0IjoxNzE2ODAxMjIwfQ.B72d2cGKgNQ5jrKMK62VUlBsgCQ6Y-TBUaGaEj5ea1o

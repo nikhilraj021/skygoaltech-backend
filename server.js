@@ -95,11 +95,12 @@ const authenticateToken = (request, response, next) =>{
         response.send("Invalid JWT Token")
     }
     else{
-        jwt.verify(jwtToken, "asdfghjkl", async(error, user) =>{
+        jwt.verify(jwtToken, "asdfghjkl", async(error, payload) =>{
             if(error){
                 response.status(401)
                 response.send("Invalid JWT Token")
             }else{
+                request.username = payload.username
                 next()
             }
         })
@@ -113,4 +114,10 @@ app.get("/employee_details/", authenticateToken, async (req, resp) =>{
     resp.send(employeeDetailsArray);
 })
 
-
+// GET profile API
+app.get("/profile/", authenticateToken, async (request, response) =>{
+    let {username} = request
+    const selectUserQuery = `SELECT * FROM users WHERE username = "${username}";`;
+    const dbUser = await db.get(selectUserQuery);
+    response.send(dbUser)
+})
